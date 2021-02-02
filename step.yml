@@ -1,4 +1,4 @@
-title: "STEP TEMPLATE"
+title: "BrowserStack App Automate - Downloader"
 summary: A short summary of the step. Don't make it too long ;)
 description: |-
   This is a Step template.
@@ -19,40 +19,41 @@ support_url: https://github.com/.../issues
 host_os_tags:
   - osx-10.10
 project_type_tags:
-  - ios
   - android
-  - xamarin
 type_tags:
-  - script
+  - utility
 is_requires_admin_user: true
 is_always_run: false
 is_skippable: false
 deps:
   brew:
-  - name: git
-  - name: wget
+    - name: curl
   apt_get:
-  - name: git
-  - name: wget
-run_if: ""
+    - name: curl
 inputs:
-  - example_step_input: Default Value - you can leave this empty if you want to
+  - browserstack_username:
     opts:
-      title: "Example Step Input"
-      summary: Summary. No more than 2-3 sentences.
+      title: BrowserStack username
+      summary: Your username for browserstack
       description: |
-        Description of this input.
 
-        Can be Markdown formatted text.
       is_expand: true
       is_required: true
-      value_options: []
-outputs:
-  - EXAMPLE_STEP_OUTPUT:
+      is_sensitive: true
+  - browserstack_access_key:
     opts:
-      title: "Example Step Output"
-      summary: Summary. No more than 2-3 sentences.
+      title: BrowserStack access key
+      summary: Your username for browserstack
       description: |
-        Description of this output.
 
-        Can be Markdown formatted text.
+      is_expand: true
+      is_required: true
+      is_sensitive: true
+  - browserstack_build_id:
+    opts:
+      title: BrowserStack build id
+      summary: build id for browserstack
+      description: |
+
+      is_expand: true
+      is_required: true

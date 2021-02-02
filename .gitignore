@@ -1,1 +1,3 @@
 .bitrise*
+*.iml
+.idea/*

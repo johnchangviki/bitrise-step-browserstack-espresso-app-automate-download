@@ -4,7 +4,9 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 app:
   envs:
   # define these in your .bitrise.secrets.yml
-  - A_SECRET_PARAM: $A_SECRET_PARAM
+  - BROWSERSTACK_USERNAME: $BROWSERSTACK_USERNAME
+  - BROWSERSTACK_ACCESS_KEY: $BROWSERSTACK_ACCESS_KEY
+  - BUILD_ID: $BUILD_ID
 
 workflows:
   test:
@@ -29,7 +31,9 @@ workflows:
           file if you would not specify another value.
         run_if: true
         inputs:
-        - example_step_input: Example Step Input's value
+        - browserstack_username: $BROWSERSTACK_USERNAME
+        - browserstack_access_key: $BROWSERSTACK_ACCESS_KEY
+        - browserstack_build_id: $BROWSERSTACK_BUILD_ID
 
 
   # ----------------------------------------------------------------

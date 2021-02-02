@@ -1,21 +1,47 @@
 #!/bin/bash
+set -e
 
-echo "This is the value specified for the input 'example_step_input': ${example_step_input}"
+function waitForResult () {
+  echo "Waiting for tests to finish execution.."
+  for ((i=1;i<=100;i++));
+  do
+    sleep 20s;
+    get_build_status="$(curl -u $browserstack_username:$browserstack_access_key -X GET "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$browserstack_build_id")"
+    build_status=$(echo "$get_build_status" | jq .status | sed 's/"//g')
+    echo "$build_status"
 
-#
-# --- Export Environment Variables for other Steps:
-# You can export Environment Variables for other Steps with
-#  envman, which is automatically installed by `bitrise setup`.
-# A very simple example:
-#  envman add --key EXAMPLE_STEP_OUTPUT --value 'the value you want to share'
-# Envman can handle piped inputs, which is useful if the text you want to
-# share is complex and you don't want to deal with proper bash escaping:
-#  cat file_with_complex_input | envman add --KEY EXAMPLE_STEP_OUTPUT
-# You can find more usage examples on envman's GitHub page
-#  at: https://github.com/bitrise-io/envman
+    if [[ $build_status == "passed" ]] ; then
+      session_id=$(echo "$get_build_status" | jq ".devices[0] .sessions[0] .id" | sed 's/"//g')
+      fetchBuildSession "$browserstack_build_id" "$session_id"
+      break
+    fi
 
-#
-# --- Exit codes:
-# The exit code of your Step is very important. If you return
-#  with a 0 exit code `bitrise` will register your Step as "successful".
-# Any non zero exit code will be registered as "failed" by `bitrise`.
+#    if [[ $build_status != "running" ]] ; then
+#      echo "Checking Test Results..."
+#      break
+#    fi
+  done
+}
+
+function fetchBuildSession () {
+  get_session_status="$(curl -u $browserstack_username:$browserstack_access_key -X GET "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/$1/sessions/$2")"
+  session_status=$(echo -n "$get_build_status" | jq .status | sed 's/"//g')
+  echo "$session_status"
+  listTestcasesData "$get_session_status"
+}
+
+function listTestcasesData () {
+  for row in $(echo "$1" | jq -r '.testcases.data | .[] | @base64');
+  do
+    _jq() {
+      echo ${row} | jq -R -r "@base64d | ${1}"
+      echo
+    }
+    echo $(_jq '.')
+  done
+}
+
+echo "username:$browserstack_username"
+echo "access_key:$browserstack_access_key"
+echo "build_id:$browserstack_build_id"
+waitForResult
